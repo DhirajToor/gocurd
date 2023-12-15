@@ -12,11 +12,9 @@ import (
 	"gorm.io/gorm"
 )
 
-type Student struct {
+type Item struct {
 	gorm.Model
-	Name    string `json:"name"`
-	Course  string `json:"course"`
-	College string `json:"college"`
+	Name string `json:"name"`
 }
 
 // Database connection
@@ -29,7 +27,7 @@ func init() {
 		log.Fatal(err)
 	}
 	// Auto Migrate the time_log table
-	db.AutoMigrate(&Student{})
+	db.AutoMigrate(&Item{})
 }
 
 func main() {
@@ -46,55 +44,55 @@ func main() {
 }
 
 func CreateHandler(c *gin.Context) {
-	var newStudent Student
-	if err := c.BindJSON(&newStudent); err != nil {
+	var newItem Item
+	if err := c.BindJSON(&newItem); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad Request"})
 		return
 	}
-	// Create the new student in the database
-	db.Create(&newStudent)
-	c.JSON(http.StatusCreated, newStudent)
+	// Create the new Item in the database
+	db.Create(&newItem)
+	c.JSON(http.StatusCreated, newItem)
 }
 
 func ReadHandler(c *gin.Context) {
-	var Students []Student
-	// Query all student from the database
-	db.Find(&Students)
-	c.JSON(http.StatusOK, Students)
+	var Items []Item
+	// Query all Item from the database
+	db.Find(&Items)
+	c.JSON(http.StatusOK, Items)
 }
 
 func UpdateHandler(c *gin.Context) {
-	// Extract Student ID from the request parameters
+	// Extract Item ID from the request parameters
 	id := c.Param("id")
-	// Parse the Student ID into an integer
-	var StudentID int
-	fmt.Sscan(id, &StudentID)
-	var updatedStudent Student
-	if err := c.BindJSON(&updatedStudent); err != nil {
+	// Parse the Item ID into an integer
+	var ItemID int
+	fmt.Sscan(id, &ItemID)
+	var updatedItem Item
+	if err := c.BindJSON(&updatedItem); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad Request"})
 		return
 	}
-	// Update the student in the database
-	db.Model(&Student{}).Where("id = ?", StudentID).Updates(updatedStudent)
-	c.JSON(http.StatusOK, gin.H{"message": "Student updated successfully"})
+	// Update the Item in the database
+	db.Model(&Item{}).Where("id = ?", ItemID).Updates(updatedItem)
+	c.JSON(http.StatusOK, gin.H{"message": "Item updated successfully"})
 }
 
 func DeleteHandler(c *gin.Context) {
-	// Extract student ID from the request parameters
+	// Extract Item ID from the request parameters
 	idParam := c.Param("id")
-	// Parse the student ID into an integer
-	StudentID, err := strconv.Atoi(idParam)
+	// Parse the Item ID into an integer
+	ItemID, err := strconv.Atoi(idParam)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid student ID"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Item ID"})
 		return
 	}
-	// Check if the student exists
-	var existingStudent Student
-	result := db.First(&existingStudent, StudentID)
+	// Check if the Item exists
+	var existingItem Item
+	result := db.First(&existingItem, ItemID)
 	if result.Error != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "student not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Item not found"})
 		return
 	}
-	db.Delete(&existingStudent)
-	c.JSON(http.StatusOK, gin.H{"message": "student deleted successfully"})
+	db.Delete(&existingItem)
+	c.JSON(http.StatusOK, gin.H{"message": "Item deleted successfully"})
 }

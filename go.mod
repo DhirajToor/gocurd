@@ -1,4 +1,4 @@
-module github.com/DhirajToor/gocurd
+module github.com/jasbirnetwork/gocurdapp
 
 go 1.21.4
 

@@ -26,11 +26,11 @@ func setupRouter() *gin.Engine {
 
 func TestCreateHandler(t *testing.T) {
 	router := setupRouter()
-	// Create a sample student for testing
-	newStudent := Student{Name: "TestStudent", Course: "CSDD", College: "Loyalist College"}
-	newStudentJSON, err := json.Marshal(newStudent)
+	// Create a sample Item for testing
+	newItem := Item{Name: "TestItem"}
+	newItemJSON, err := json.Marshal(newItem)
 	assert.NoError(t, err)
-	req, err := http.NewRequest(http.MethodPost, "/create", bytes.NewBuffer(newStudentJSON))
+	req, err := http.NewRequest(http.MethodPost, "/create", bytes.NewBuffer(newItemJSON))
 	assert.NoError(t, err)
 
 	// Set the content type to JSON
@@ -38,8 +38,8 @@ func TestCreateHandler(t *testing.T) {
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusCreated, w.Code)
-	var createdStudent Student
-	err = json.Unmarshal(w.Body.Bytes(), &createdStudent)
+	var createdItem Item
+	err = json.Unmarshal(w.Body.Bytes(), &createdItem)
 	assert.NoError(t, err)
 }
 
@@ -53,35 +53,35 @@ func TestReadHandler(t *testing.T) {
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
-	var Students []Student
-	err = json.Unmarshal(w.Body.Bytes(), &Students)
+	var Items []Item
+	err = json.Unmarshal(w.Body.Bytes(), &Items)
 	assert.NoError(t, err)
 }
 
 func TestUpdateHandler(t *testing.T) {
 	router := setupRouter()
 
-	newStudent := Student{Name: "TestStudent", Course: "CSDD", College: "Loyalist College"}
-	newStudentJSON, err := json.Marshal(newStudent)
+	newItem := Item{Name: "TestItem"}
+	newItemJSON, err := json.Marshal(newItem)
 	assert.NoError(t, err)
 
-	// use /create endpoint to create a new Student for updating
-	createReq, err := http.NewRequest(http.MethodPost, "/create", bytes.NewBuffer(newStudentJSON))
+	// use /create endpoint to create a new Item for updating
+	createReq, err := http.NewRequest(http.MethodPost, "/create", bytes.NewBuffer(newItemJSON))
 	assert.NoError(t, err)
 	createReq.Header.Set("Content-Type", "application/json")
 	createW := httptest.NewRecorder()
 	router.ServeHTTP(createW, createReq)
 	assert.Equal(t, http.StatusCreated, createW.Code)
 
-	var createdStudent Student
-	err = json.Unmarshal(createW.Body.Bytes(), &createdStudent)
+	var createdItem Item
+	err = json.Unmarshal(createW.Body.Bytes(), &createdItem)
 	assert.NoError(t, err)
-	createdStudent.Name = "TestStudentUpdated"
-	updatedStudentJSON, err := json.Marshal(createdStudent)
+	createdItem.Name = "TestItemUpdated"
+	updatedItemJSON, err := json.Marshal(createdItem)
 	assert.NoError(t, err)
 
 	// Perform a PUT request to the /update/:id endpoint
-	updateReq, err := http.NewRequest(http.MethodPut, "/update/"+strconv.Itoa(int(createdStudent.ID)), bytes.NewBuffer(updatedStudentJSON))
+	updateReq, err := http.NewRequest(http.MethodPut, "/update/"+strconv.Itoa(int(createdItem.ID)), bytes.NewBuffer(updatedItemJSON))
 	assert.NoError(t, err)
 	updateReq.Header.Set("Content-Type", "application/json")
 	updateW := httptest.NewRecorder()
@@ -92,25 +92,25 @@ func TestUpdateHandler(t *testing.T) {
 func TestDeleteHandler(t *testing.T) {
 	router := setupRouter()
 
-	// Create a sample student for testing
-	newStudent := Student{Name: "TestStudentUpdate", Course: "CSDD", College: "Loyalist College"}
-	newStudentJSON, err := json.Marshal(newStudent)
+	// Create a sample Item for testing
+	newItem := Item{Name: "TestItemUpdate"}
+	newItemJSON, err := json.Marshal(newItem)
 	assert.NoError(t, err)
 
 	// use /create to get stduent endpoint
-	createReq, err := http.NewRequest(http.MethodPost, "/create", bytes.NewBuffer(newStudentJSON))
+	createReq, err := http.NewRequest(http.MethodPost, "/create", bytes.NewBuffer(newItemJSON))
 	assert.NoError(t, err)
 	createReq.Header.Set("Content-Type", "application/json")
 
 	createW := httptest.NewRecorder()
 	router.ServeHTTP(createW, createReq)
 	assert.Equal(t, http.StatusCreated, createW.Code)
-	var createdStudent Student
-	err = json.Unmarshal(createW.Body.Bytes(), &createdStudent)
+	var createdItem Item
+	err = json.Unmarshal(createW.Body.Bytes(), &createdItem)
 	assert.NoError(t, err)
 
 	// pass previous get id to /delete/:id endpoint
-	deleteReq, err := http.NewRequest(http.MethodDelete, "/delete/"+strconv.Itoa(int(createdStudent.ID)), nil)
+	deleteReq, err := http.NewRequest(http.MethodDelete, "/delete/"+strconv.Itoa(int(createdItem.ID)), nil)
 	assert.NoError(t, err)
 	deleteW := httptest.NewRecorder()
 	router.ServeHTTP(deleteW, deleteReq)
