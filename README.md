@@ -58,7 +58,7 @@ docker run -p 7575:8080 dhirajtoor/gocurd:1.0
 #### Read Response:
 - Status Code: 200 OK
 - JSON Object with a success message.
-- 
+
 ### For test the app run below command.
 
 ```
